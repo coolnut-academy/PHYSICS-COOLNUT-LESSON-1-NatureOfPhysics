@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Physics Coolnut: SI Units & Conversions</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+          <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body class="p-4 sm:p-8 flex flex-col items-center justify-center relative w-full">
+
+          <!-- Timer UI -->
+          <div id="exam-timer"
+                    class="hidden fixed top-4 right-4 sm:top-6 sm:right-6 bg-white/95 backdrop-blur-md px-5 py-3 rounded-2xl shadow-xl border-2 border-red-200 z-50 flex items-center gap-3 text-red-500 font-bold text-xl sm:text-2xl transition-all">
+                    <i class="fas fa-stopwatch animate-pulse"></i>
+                    <span id="timer-display" class="font-mono">00:00</span>
+          </div>
+
+          <div id="app"
+                    class="max-w-5xl w-full bg-glass rounded-[2rem] shadow-2xl overflow-hidden relative border border-white/80">
+
+                    <!-- Header -->
+                    <div
+                              class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 p-8 sm:p-10 text-center text-white relative overflow-hidden">
+                              <div class="absolute inset-0 bg-black/10"></div>
+                              <div class="absolute -top-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+                              <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl">
+                              </div>
+
+                              <div class="relative z-10">
+                                        <h1 class="text-4xl sm:text-5xl font-black mb-3 tracking-tight"><i
+                                                            class="fas fa-atom mr-4 animate-[spin_10s_linear_infinite]"></i>Physics
+                                                  Coolnut</h1>
+                                        <p
+                                                  class="text-xl sm:text-2xl text-white/90 font-medium bg-black/20 inline-block px-6 py-2 rounded-full backdrop-blur-sm">
+                                                  หน่วยฐาน SI และ การแปลงหน่วย</p>
+                              </div>
+                    </div>
+
+                    <div class="p-6 sm:p-10 min-h-[500px]">
+
+                              <!-- MAIN MENU -->
+                              <div id="menu-screen" class="text-center space-y-12 py-8">
+                                        <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 mb-8">
+                                                  เลือกโหมดการเรียนรู้</h2>
+                                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                                                  <!-- Theory -->
+                                                  <button onclick="showScreen('theory-screen')"
+                                                            class="group relative bg-white border border-slate-200 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 overflow-hidden">
+                                                            <div
+                                                                      class="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            </div>
+                                                            <div class="relative z-10">
+                                                                      <div
+                                                                                class="text-5xl text-blue-500 mb-4 group-hover:scale-110 transition-transform">
+                                                                                <i class="fas fa-book"></i></div>
+                                                                      <h3
+                                                                                class="text-2xl font-bold text-slate-800 mb-2">
+                                                                                เนื้อหา</h3>
+                                                                      <p class="text-sm text-slate-500 font-medium">
+                                                                                หน่วย SI และ คำอุปสรรคแบบครบถ้วน</p>
+                                                            </div>
+                                                  </button>
+
+                                                  <!-- Examples (20 types) -->
+                                                  <button onclick="showScreen('examples-screen')"
+                                                            class="group relative bg-white border border-slate-200 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 overflow-hidden">
+                                                            <div
+                                                                      class="absolute inset-0 bg-gradient-to-br from-emerald-50 to-teal-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            </div>
+                                                            <div class="relative z-10">
+                                                                      <div
+                                                                                class="text-5xl text-emerald-500 mb-4 group-hover:scale-110 transition-transform">
+                                                                                <i class="fas fa-list-ul"></i></div>
+                                                                      <h3
+                                                                                class="text-2xl font-bold text-slate-800 mb-2">
+                                                                                ตัวอย่าง (20 ข้อ)</h3>
+                                                                      <p class="text-sm text-slate-500 font-medium">
+                                                                                โจทย์ประยุกต์ 20 รูปแบบที่ออกสอบแน่นอน
+                                                                      </p>
+                                                            </div>
+                                                  </button>
+
+                                                  <!-- Practice Menu -->
+                                                  <button onclick="showScreen('practice-menu-screen')"
+                                                            class="group relative bg-white border border-slate-200 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 overflow-hidden">
+                                                            <div
+                                                                      class="absolute inset-0 bg-gradient-to-br from-amber-50 to-orange-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            </div>
+                                                            <div class="relative z-10">
+                                                                      <div
+                                                                                class="text-5xl text-amber-500 mb-4 group-hover:scale-110 transition-transform">
+                                                                                <i class="fas fa-dumbbell"></i></div>
+                                                                      <h3
+                                                                                class="text-2xl font-bold text-slate-800 mb-2">
+                                                                                ฝึกฝน</h3>
+                                                                      <p class="text-sm text-slate-500 font-medium">
+                                                                                แยกซ้อมได้ทั้ง 3 ด่าน (เฉลยทันที)</p>
+                                                            </div>
+                                                  </button>
+                                        </div>
+
+                                        <div class="mt-8 pt-8 border-t border-slate-200">
+                                                  <button onclick="showScreen('register-screen')"
+                                                            class="group relative bg-gradient-to-r from-pink-500 to-rose-500 p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2 max-w-sm mx-auto w-full text-white overflow-hidden flex items-center justify-center gap-4">
+                                                            <div
+                                                                      class="text-4xl group-hover:scale-110 transition-transform">
+                                                                      <i class="fas fa-rocket"></i></div>
+                                                            <div class="text-left">
+                                                                      <h3
+                                                                                class="text-2xl font-black mb-1 tracking-wider">
+                                                                                โหมดทดสอบ</h3>
+                                                                      <p class="text-sm font-medium opacity-90">
+                                                                                จับเวลาจริง เก็บ 20 คะแนน</p>
+                                                            </div>
+                                                  </button>
+                                        </div>
+
+                                        <!-- Dev Badge -->
+                                        <footer
+                                                  class="mt-20 text-center pb-12 flex flex-col items-center justify-center relative">
+                                                  <!-- Decorative tech glow behind footer -->
+                                                  <div
+                                                            class="absolute inset-0 flex justify-center items-center pointer-events-none opacity-20">
+                                                            <div class="w-96 h-32 bg-cyan-400 blur-[80px] rounded-full">
+                                                            </div>
+                                                  </div>
+
+                                                  <div
+                                                            class="relative group cursor-pointer hover:scale-105 transition-transform duration-300">
+                                                            <!-- Tech Border Glow -->
+                                                            <div
+                                                                      class="absolute -inset-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse">
+                                                            </div>
+
+                                                            <!-- Inner Content -->
+                                                            <div
+                                                                      class="relative bg-slate-900 px-8 py-5 rounded-2xl shadow-2xl border border-slate-700 flex flex-col items-center justify-center gap-3 min-w-[320px]">
+                                                                      <div class="flex items-center space-x-3">
+                                                                                <i
+                                                                                          class="fas fa-microchip text-cyan-400 text-2xl animate-bounce"></i>
+                                                                                <span
+                                                                                          class="text-slate-400 font-mono text-sm tracking-[0.2em] uppercase">Developed
+                                                                                          by</span>
+                                                                                <span
+                                                                                          class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 font-black text-xl tracking-wide drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">ครูสาธิต
+                                                                                          ศิริวัชน์</span>
+                                                                      </div>
+
+                                                                      <div
+                                                                                class="h-px w-full bg-gradient-to-r from-transparent via-slate-600 to-transparent my-1">
+                                                                      </div>
+
+                                                                      <div class="flex items-center space-x-2">
+                                                                                <i
+                                                                                          class="fas fa-graduation-cap text-purple-400 text-lg"></i>
+                                                                                <span
+                                                                                          class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 font-bold text-lg drop-shadow-[0_0_8px_rgba(232,121,249,0.5)] tracking-wide">โรงเรียนห้องสอนศึกษา
+                                                                                          ในพระอุปถัมภ์ฯ</span>
+                                                                      </div>
+                                                            </div>
+                                                  </div>
+                                        </footer>
+                              </div>
+
+                              <!-- THEORY SCREEN -->
+                              <div id="theory-screen" class="hidden">
+                                        <div
+                                                  class="flex justify-between items-center mb-8 pb-4 border-b-2 border-slate-100">
+                                                  <h2 class="text-3xl font-bold text-blue-600 flex items-center"><i
+                                                                      class="fas fa-book-open mr-3"></i> เนื้อหาบทเรียน
+                                                  </h2>
+                                                  <button onclick="showScreen('menu-screen')"
+                                                            class="bg-slate-100 hover:bg-slate-200 text-slate-600 py-2 px-6 rounded-xl font-bold transition-colors">กลับหน้าหลัก</button>
+                                        </div>
+
+                                        <div class="space-y-10">
+                                                  <div
+                                                            class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                                                            <h3
+                                                                      class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
+                                                                      <span
+                                                                                class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg mr-3">1</span>
+                                                                      หน่วยฐาน SI ทั้ง 7 หน่วย</h3>
+                                                            <div id="si-units-container"
+                                                                      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-slate-700 font-medium">
+                                                            </div>
+                                                            <div class="mt-8 flex justify-end">
+                                                                      <button onclick="initPracticeStage1()" class="bg-blue-500 hover:bg-blue-600 text-white py-2.5 px-6 rounded-xl font-bold shadow-md transition-all hover:-translate-y-1 group flex items-center">
+                                                                                ลุยสนามซ้อมด่าน 1 <i class="fas fa-shapes ml-2 group-hover:scale-110 transition-transform"></i>
+                                                                      </button>
+                                                            </div>
+                                                  </div>
+
+                                                  <div
+                                                            class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                                                            <h3
+                                                                      class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
+                                                                      <span
+                                                                                class="bg-purple-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg mr-3">2</span>
+                                                                      คำอุปสรรค (Prefixes) 12 ตัวที่ต้องรู้</h3>
+                                                            <div id="prefixes-container"
+                                                                      class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 text-center">
+                                                            </div>
+                                                            <div class="mt-8 flex justify-end">
+                                                                      <button onclick="initPracticeStage2()" class="bg-purple-500 hover:bg-purple-600 text-white py-2.5 px-6 rounded-xl font-bold shadow-md transition-all hover:-translate-y-1 group flex items-center">
+                                                                                ลุยสนามซ้อมด่าน 2 <i class="fas fa-superscript ml-2 group-hover:scale-110 transition-transform"></i>
+                                                                      </button>
+                                                            </div>
+                                                  </div>
+
+                                                  <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                                                            <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
+                                                                      <span class="bg-pink-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg mr-3">3</span>
+                                                                      ทำไมต้องแปลงหน่วย?
+                                                            </h3>
+                                                            
+                                                            <div class="bg-gradient-to-br from-pink-50 to-rose-50 p-6 rounded-2xl border border-pink-100 shadow-sm mb-6 relative overflow-hidden">
+                                                                      <i class="fas fa-quote-right absolute text-8xl text-pink-500/10 -bottom-4 -right-4 transform -rotate-12"></i>
+                                                                      <p class="text-slate-700 text-lg leading-relaxed font-medium">
+                                                                                การแปลงหน่วย คือการเปลี่ยนปริมาณจากหน่วยหนึ่งไปเป็นอีกหน่วยหนึ่ง โดยที่ <b class="text-pink-600">มูลค่าความเป็นจริงของปริมาณนั้นยังคงเท่าเดิม</b> เปรียบเสมือนการแปลภาษาให้คนละชาติเข้าใจตรงกันว่าของชิ้นนี้ยาวเท่าไหร่ หรือหนักแค่ไหน!
+                                                                      </p>
+                                                            </div>
+
+                                                            <h4 class="text-xl font-black text-blue-700 mb-4 flex items-center">
+                                                                      <i class="fas fa-globe-asia text-blue-500 mr-3"></i> ประโยชน์ในชีวิตจริง (พร้อมตัวอย่าง)
+                                                            </h4>
+                                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                                      <div class="space-y-4">
+                                                                                <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 shadow-sm">
+                                                                                          <h4 class="font-bold text-blue-800 mb-2">1. ป้องกันความผิดพลาดร้ายแรง</h4>
+                                                                                          <p class="text-sm text-slate-600">เช่น องค์การ NASA เคยสูญเสียดาวเทียมมูลค่ามหาศาลไป เพราะทีมวิศวกรใช้หน่วยคำนวณแรงขับไม่ตรงกัน (ปอนด์ กับ นิวตัน)!</p>
+                                                                                </div>
+                                                                                <div class="bg-purple-50 p-4 rounded-2xl border border-purple-100 shadow-sm">
+                                                                                          <h4 class="font-bold text-purple-800 mb-2">2. ความสะดวกในการสื่อสาร</h4>
+                                                                                          <p class="text-sm text-slate-600">เราไม่บอกระยะทางไปกรุงเทพฯ เป็น "เซนติเมตร" เพราะตัวเลขจะยาวเกินไป เราจึงแปลงเป็น "กิโลเมตร" เพื่อให้กะทัดรัดและเข้าใจง่าย</p>
+                                                                                </div>
+                                                                      </div>
+
+                                                                      <div class="bg-slate-800 text-slate-200 p-6 rounded-2xl relative shadow-inner flex flex-col justify-center">
+                                                                                <div class="absolute top-0 right-0 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-xl shadow-md">ตัวอย่าง</div>
+                                                                                <p class="text-sm text-slate-400 mb-2">หมอสั่งจ่ายยาให้คนไข้:</p>
+                                                                                <p class="text-xl text-white font-medium mb-4 leading-relaxed">
+                                                                                          "ให้พาราเซตามอล <span class="text-pink-400 font-bold border-b-2 border-pink-400 border-dashed pb-1">500 มิลลิกรัม (mg)</span>"
+                                                                                </p>
+                                                                                <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                                                                                          แต่ยาในคลังของโรงพยาบาลมีหน่วยเป็น <span class="text-emerald-400 font-bold">กรัม (g)</span> <br>
+                                                                                          พยาบาลจึงต้องรู้ว่า <span class="text-pink-400 font-bold">500 mg</span> มีค่าเท่ากับ <span class="text-emerald-400 font-bold">0.5 g</span> จะได้หยิบยาให้คนไข้ได้ถูกต้องและปลอดภัย!
+                                                                                </p>
+                                                                                <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 text-center font-mono text-emerald-400 text-sm font-bold shadow-inner">
+                                                                                          500 &times; 10⁻³ g = 0.5 g
+                                                                                </div>
+                                                                      </div>
+                                                            </div>
+                                                  </div>
+                                        </div>
+
+                                        <div class="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
+                                                  <button onclick="showScreen('examples-screen')"
+                                                            class="bg-indigo-500 hover:bg-indigo-600 text-white py-4 px-8 rounded-2xl font-bold text-lg shadow-lg transition-all hover:-translate-y-1">
+                                                            <i class="fas fa-list-ol mr-2"></i> ดูตัวอย่าง 20 แบบ
+                                                  </button>
+                                                  <button onclick="initPracticeStage3()"
+                                                            class="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white py-4 px-8 rounded-2xl font-bold text-lg shadow-xl transition-all hover:-translate-y-1 group">
+                                                            ลุยสนามซ้อมด่าน 3 <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform"></i>
+                                                  </button>
+                                        </div>
+                              </div>
+
+                              <!-- EXAMPLES SCREEN -->
+                              <div id="examples-screen" class="hidden">
+                                        <div
+                                                  class="flex justify-between items-center mb-8 pb-4 border-b-2 border-slate-100">
+                                                  <h2 class="text-3xl font-bold text-emerald-600 flex items-center"><i
+                                                                      class="fas fa-list-ul mr-3"></i>
+                                                            ตัวอย่างการแปลงหน่วย 20 รูปแบบ</h2>
+                                                  <button onclick="showScreen('menu-screen')"
+                                                            class="bg-slate-100 hover:bg-slate-200 text-slate-600 py-2 px-6 rounded-xl font-bold transition-colors">กลับหน้าหลัก</button>
+                                        </div>
+
+                                        <div
+                                                  class="bg-gradient-to-r from-emerald-50 to-teal-50 p-5 rounded-2xl border border-emerald-100 inline-block mb-8 shadow-sm">
+                                                  <p class="text-lg font-medium text-slate-700">สูตรลัด: <span
+                                                                      class="font-bold text-2xl text-emerald-600 ml-2">(ค่าเดิม
+                                                                      &times; คำอุปสรรคเดิม) &divide;
+                                                                      คำอุปสรรคใหม่</span></p>
+                                        </div>
+
+                                        <div id="examples-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        </div>
+
+                                        <div class="mt-10 text-center">
+                                                  <button onclick="initPracticeStage3()"
+                                                            class="bg-amber-500 hover:bg-amber-600 text-white py-4 px-10 rounded-2xl font-bold text-xl shadow-xl transition-all hover:-translate-y-1">
+                                                            ไปลองฝึกทำโจทย์ด้วยตัวเอง <i class="fas fa-play ml-2"></i>
+                                                  </button>
+                                        </div>
+                              </div>
+
+                              <!-- PRACTICE MENU SCREEN -->
+                              <div id="practice-menu-screen" class="hidden">
+                                        <div
+                                                  class="flex justify-between items-center mb-8 pb-4 border-b-2 border-slate-100">
+                                                  <h2 class="text-3xl font-bold text-amber-600 flex items-center"><i
+                                                                      class="fas fa-dumbbell mr-3"></i>
+                                                            เลือกด่านที่จะซ้อม</h2>
+                                                  <button onclick="showScreen('menu-screen')"
+                                                            class="bg-slate-100 hover:bg-slate-200 text-slate-600 py-2 px-6 rounded-xl font-bold transition-colors">กลับหน้าหลัก</button>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto mt-10">
+                                                  <button onclick="initPracticeStage1()"
+                                                            class="bg-white p-8 rounded-3xl border-2 border-blue-100 hover:border-blue-400 hover:shadow-lg transition-all text-center group">
+                                                            <div
+                                                                      class="text-4xl text-blue-500 mb-4 group-hover:scale-110 transition-transform">
+                                                                      <i class="fas fa-shapes"></i></div>
+                                                            <h3 class="text-2xl font-bold text-slate-800 mb-2">ด่าน 1
+                                                            </h3>
+                                                            <p class="text-blue-600 font-medium">จับคู่หน่วยฐาน SI</p>
+                                                  </button>
+                                                  <button onclick="initPracticeStage2()"
+                                                            class="bg-white p-8 rounded-3xl border-2 border-purple-100 hover:border-purple-400 hover:shadow-lg transition-all text-center group">
+                                                            <div
+                                                                      class="text-4xl text-purple-500 mb-4 group-hover:scale-110 transition-transform">
+                                                                      <i class="fas fa-superscript"></i></div>
+                                                            <h3 class="text-2xl font-bold text-slate-800 mb-2">ด่าน 2
+                                                            </h3>
+                                                            <p class="text-purple-600 font-medium">จับคู่คำอุปสรรค</p>
+                                                  </button>
+                                                  <button onclick="initPracticeStage3()"
+                                                            class="bg-white p-8 rounded-3xl border-2 border-pink-100 hover:border-pink-400 hover:shadow-lg transition-all text-center group">
+                                                            <div
+                                                                      class="text-4xl text-pink-500 mb-4 group-hover:scale-110 transition-transform">
+                                                                      <i class="fas fa-calculator"></i></div>
+                                                            <h3 class="text-2xl font-bold text-slate-800 mb-2">ด่าน 3
+                                                            </h3>
+                                                            <p class="text-pink-600 font-medium">ประยุกต์แปลงหน่วย</p>
+                                                  </button>
+                                        </div>
+                              </div>
+
+                              <!-- PRACTICE STAGE 3 SCREEN -->
+                              <div id="practice-stage3-screen" class="hidden">
+                                        <div
+                                                  class="flex justify-between items-center mb-8 pb-4 border-b-2 border-slate-100">
+                                                  <h2 class="text-3xl font-bold text-amber-600 flex items-center"><i
+                                                                      class="fas fa-dumbbell mr-3"></i> สนามซ้อม
+                                                            (ทำซ้ำได้ไม่จำกัด)</h2>
+                                                  <button onclick="showScreen('menu-screen')"
+                                                            class="bg-slate-100 hover:bg-slate-200 text-slate-600 py-2 px-6 rounded-xl font-bold transition-colors">กลับหน้าหลัก</button>
+                                        </div>
+
+                                        <div
+                                                  class="bg-white p-8 sm:p-12 rounded-3xl border border-amber-100 shadow-lg text-center max-w-3xl mx-auto">
+                                                  <span
+                                                            class="inline-block px-4 py-1.5 bg-amber-100 text-amber-800 rounded-full text-sm font-bold mb-6">ระบบสุ่มโจทย์
+                                                            20 รูปแบบ</span>
+
+                                                  <p class="text-2xl sm:text-3xl font-medium text-slate-800 mb-10 leading-relaxed"
+                                                            id="prac-q-text">โหลดโจทย์...</p>
+
+                                                  <div
+                                                            class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+                                                            <input type="number" step="any" id="prac-ans-input"
+                                                                      class="w-full sm:w-64 px-6 py-4 text-xl border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all text-center font-bold text-amber-700"
+                                                                      placeholder="ระบุตัวเลขคำตอบ">
+
+                                                            <div class="flex gap-2 w-full sm:w-auto">
+                                                                      <button onclick="checkPracticeAnswer()"
+                                                                                class="flex-1 sm:flex-none bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 px-8 rounded-2xl shadow-lg transition-all hover:-translate-y-1 text-lg">
+                                                                                ตรวจคำตอบ
+                                                                      </button>
+                                                                      <button onclick="generatePracticeQuestion()"
+                                                                                class="flex-1 sm:flex-none bg-amber-400 hover:bg-amber-500 text-amber-900 font-bold py-4 px-6 rounded-2xl shadow-lg transition-all hover:-translate-y-1 text-lg"
+                                                                                title="สุ่มโจทย์ใหม่">
+                                                                                <i
+                                                                                          class="fas fa-random mr-2"></i>สุ่มใหม่
+                                                                      </button>
+                                                            </div>
+                                                  </div>
+
+                                                  <div id="prac-feedback"
+                                                            class="hidden mt-6 p-6 rounded-2xl text-xl animate-[fadeIn_0.3s_ease-out]">
+                                                  </div>
+                                        </div>
+                              </div>
+
+                              <!-- REGISTER SCREEN -->
+                              <div id="register-screen" class="hidden">
+                                        <div class="max-w-xl mx-auto">
+                                                  <div class="text-center mb-8">
+                                                            <div
+                                                                      class="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl text-pink-500">
+                                                                      <i class="fas fa-id-badge"></i>
+                                                            </div>
+                                                            <h2 class="text-3xl font-bold text-slate-800">
+                                                                      ลงทะเบียนผู้สอบ</h2>
+                                                            <p class="text-slate-500 mt-2">
+                                                                      กรอกข้อมูลให้ครบถ้วนก่อนเริ่มจับเวลา</p>
+                                                  </div>
+
+                                                  <form id="student-form" onsubmit="startExam(event)"
+                                                            class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 space-y-6">
+                                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                                                      <div>
+                                                                                <label
+                                                                                          class="block text-sm font-bold text-slate-700 mb-2">ชื่อ</label>
+                                                                                <input type="text" id="fname" required
+                                                                                          class="w-full px-5 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-50 transition-all text-lg font-medium">
+                                                                      </div>
+                                                                      <div>
+                                                                                <label
+                                                                                          class="block text-sm font-bold text-slate-700 mb-2">นามสกุล</label>
+                                                                                <input type="text" id="lname" required
+                                                                                          class="w-full px-5 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-50 transition-all text-lg font-medium">
+                                                                      </div>
+                                                            </div>
+                                                            <div class="grid grid-cols-2 gap-6">
+                                                                      <div>
+                                                                                <label
+                                                                                          class="block text-sm font-bold text-slate-700 mb-2">ชั้น
+                                                                                          ม.4/...</label>
+                                                                                <input type="number" id="classroom"
+                                                                                          min="1" max="20" required
+                                                                                          placeholder="เช่น 1"
+                                                                                          class="w-full px-5 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-50 transition-all text-lg font-medium">
+                                                                      </div>
+                                                                      <div>
+                                                                                <label
+                                                                                          class="block text-sm font-bold text-slate-700 mb-2">เลขที่</label>
+                                                                                <input type="number" id="rollno" min="1"
+                                                                                          max="60" required
+                                                                                          placeholder="เช่น 15"
+                                                                                          class="w-full px-5 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-50 transition-all text-lg font-medium">
+                                                                      </div>
+                                                            </div>
+
+                                                            <div
+                                                                      class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-start">
+                                                                      <i
+                                                                                class="fas fa-info-circle text-blue-500 mt-1 mr-3 text-lg"></i>
+                                                                      <p
+                                                                                class="text-sm text-blue-800 font-medium leading-relaxed">
+                                                                                กติกาการให้คะแนน: ด่านละ 5 คะแนน (รวม 15
+                                                                                คะแนน) <br>
+                                                                                + คะแนนเวลา 5 คะแนน (ทำเสร็จไว
+                                                                                ได้คะแนนเยอะ
+                                                                                <b>แต่จะถูกนำไปคูณกับความถูกต้องของด่านอื่นๆ
+                                                                                          ห้ามกดมั่วนะ!</b>)
+                                                                      </p>
+                                                            </div>
+
+                                                            <div class="pt-4 flex flex-col sm:flex-row gap-4">
+                                                                      <button type="button"
+                                                                                onclick="showScreen('menu-screen')"
+                                                                                class="w-full sm:w-auto flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-4 px-6 rounded-xl font-bold text-lg transition-all">ยกเลิก</button>
+                                                                      <button type="submit"
+                                                                                class="w-full sm:w-auto flex-[2] bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white py-4 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+                                                                                เริ่มทำแบบทดสอบ <i
+                                                                                          class="fas fa-play ml-2"></i>
+                                                                      </button>
+                                                            </div>
+                                                  </form>
+                                        </div>
+                              </div>
+
+                              <!-- STAGE 1: Base Units -->
+                              <div id="stage-1-screen" class="hidden">
+                                        <div
+                                                  class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-slate-100 pb-4 mb-6 gap-4">
+                                                  <div>
+                                                            <h2 class="text-2xl sm:text-3xl font-bold text-blue-600 mb-1"
+                                                                      id="s1-title">ด่านที่ 1: จับคู่หน่วยฐาน SI</h2>
+                                                            <p class="text-slate-500 font-medium text-sm sm:text-base"
+                                                                      id="s1-desc">คลิกเลือก "ปริมาณ" และ "หน่วย"
+                                                                      ให้ถูกต้องตรงกัน</p>
+                                                  </div>
+                                                  <div id="s1-score-badge"
+                                                            class="bg-blue-100 text-blue-800 px-4 py-2 rounded-xl border border-blue-200 font-bold whitespace-nowrap shadow-sm">
+                                                            คะแนนด่านนี้: 5
+                                                  </div>
+                                                  <button id="s1-back-btn" onclick="showScreen('practice-menu-screen')"
+                                                            class="hidden bg-slate-100 hover:bg-slate-200 text-slate-600 py-2 px-6 rounded-xl font-bold transition-colors">กลับหน้าซ้อม</button>
+                                        </div>
+
+                                        <div class="flex flex-col sm:flex-row gap-6 mb-10">
+                                                  <div
+                                                            class="w-full sm:w-1/2 bg-slate-50/50 p-5 rounded-3xl border-2 border-slate-100 shadow-inner">
+                                                            <h3
+                                                                      class="text-center font-bold text-slate-400 mb-5 tracking-widest uppercase text-sm">
+                                                                      ปริมาณ (Quantity)</h3>
+                                                            <div id="s1-left" class="space-y-3"></div>
+                                                  </div>
+                                                  <div
+                                                            class="w-full sm:w-1/2 bg-slate-50/50 p-5 rounded-3xl border-2 border-slate-100 shadow-inner">
+                                                            <h3
+                                                                      class="text-center font-bold text-slate-400 mb-5 tracking-widest uppercase text-sm">
+                                                                      หน่วย (Unit)</h3>
+                                                            <div id="s1-right" class="space-y-3"></div>
+                                                  </div>
+                                        </div>
+
+                                        <div class="text-center flex justify-center gap-4">
+                                                  <button id="s1-submit-btn" onclick="submitStage1()"
+                                                            class="bg-blue-600 hover:bg-blue-700 text-white py-4 px-12 rounded-2xl font-bold shadow-lg shadow-blue-200 transition-all hover:-translate-y-1 text-xl">ส่งคำตอบ
+                                                            ด่าน 1 <i class="fas fa-arrow-right ml-2"></i></button>
+                                                  <button id="s1-random-btn" onclick="initPracticeStage1()"
+                                                            class="hidden bg-amber-400 hover:bg-amber-500 text-amber-900 py-4 px-8 rounded-2xl font-bold shadow-lg transition-all hover:-translate-y-1 text-xl"><i
+                                                                      class="fas fa-random mr-2"></i>สุ่มโจทย์ใหม่</button>
+                                        </div>
+                              </div>
+
+                              <!-- STAGE 2: Prefixes -->
+                              <div id="stage-2-screen" class="hidden">
+                                        <div
+                                                  class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-slate-100 pb-4 mb-6 gap-4">
+                                                  <div>
+                                                            <h2 class="text-2xl sm:text-3xl font-bold text-purple-600 mb-1"
+                                                                      id="s2-title">ด่านที่ 2: จับคู่คำอุปสรรค</h2>
+                                                            <p class="text-slate-500 font-medium text-sm sm:text-base"
+                                                                      id="s2-desc">จับคู่ชื่อคำอุปสรรค กับ
+                                                                      ตัวเลขพหุคูณให้ถูกต้อง</p>
+                                                  </div>
+                                                  <div id="s2-score-badge"
+                                                            class="bg-purple-100 text-purple-800 px-4 py-2 rounded-xl border border-purple-200 font-bold whitespace-nowrap shadow-sm">
+                                                            คะแนนด่านนี้: 5
+                                                  </div>
+                                                  <button id="s2-back-btn" onclick="showScreen('practice-menu-screen')"
+                                                            class="hidden bg-slate-100 hover:bg-slate-200 text-slate-600 py-2 px-6 rounded-xl font-bold transition-colors">กลับหน้าซ้อม</button>
+                                        </div>
+
+                                        <div class="flex flex-col sm:flex-row gap-6 mb-10">
+                                                  <div
+                                                            class="w-full sm:w-1/2 bg-slate-50/50 p-5 rounded-3xl border-2 border-slate-100 shadow-inner">
+                                                            <h3
+                                                                      class="text-center font-bold text-slate-400 mb-5 tracking-widest uppercase text-sm">
+                                                                      คำอุปสรรค (Prefix)</h3>
+                                                            <div id="s2-left" class="space-y-3"></div>
+                                                  </div>
+                                                  <div
+                                                            class="w-full sm:w-1/2 bg-slate-50/50 p-5 rounded-3xl border-2 border-slate-100 shadow-inner">
+                                                            <h3
+                                                                      class="text-center font-bold text-slate-400 mb-5 tracking-widest uppercase text-sm">
+                                                                      ตัวพหุคูณ (Multiplier)</h3>
+                                                            <div id="s2-right" class="space-y-3"></div>
+                                                  </div>
+                                        </div>
+
+                                        <div class="text-center flex justify-center gap-4">
+                                                  <button id="s2-submit-btn" onclick="submitStage2()"
+                                                            class="bg-purple-600 hover:bg-purple-700 text-white py-4 px-12 rounded-2xl font-bold shadow-lg shadow-purple-200 transition-all hover:-translate-y-1 text-xl">ส่งคำตอบ
+                                                            ด่าน 2 <i class="fas fa-arrow-right ml-2"></i></button>
+                                                  <button id="s2-random-btn" onclick="initPracticeStage2()"
+                                                            class="hidden bg-amber-400 hover:bg-amber-500 text-amber-900 py-4 px-8 rounded-2xl font-bold shadow-lg transition-all hover:-translate-y-1 text-xl"><i
+                                                                      class="fas fa-random mr-2"></i>สุ่มโจทย์ใหม่</button>
+                                        </div>
+                              </div>
+
+                              <!-- STAGE 3: Application -->
+                              <div id="stage-3-screen" class="hidden">
+                                        <div
+                                                  class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-slate-100 pb-4 mb-6 gap-4">
+                                                  <div>
+                                                            <h2
+                                                                      class="text-2xl sm:text-3xl font-bold text-pink-600 mb-1">
+                                                                      ด่านที่ 3: ประยุกต์การแปลงหน่วย</h2>
+                                                            <p class="text-slate-500 font-medium text-sm sm:text-base">
+                                                                      พิมพ์เฉพาะ <b>ตัวเลข</b> ลงในช่องว่าง (ข้อละ 2.5
+                                                                      คะแนน)</p>
+                                                  </div>
+                                        </div>
+
+                                        <div class="space-y-6 max-w-4xl mx-auto">
+                                                  <div
+                                                            class="bg-white p-6 sm:p-8 rounded-3xl border-2 border-slate-100 shadow-md">
+                                                            <div class="flex items-start">
+                                                                      <div
+                                                                                class="bg-slate-100 text-slate-600 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mr-4 shrink-0">
+                                                                                1</div>
+                                                                      <div class="w-full">
+                                                                                <p class="text-xl sm:text-2xl font-medium text-slate-800 mb-6"
+                                                                                          id="q1-text">โหลดโจทย์...</p>
+                                                                                <div
+                                                                                          class="flex flex-col sm:flex-row items-center gap-4 bg-slate-50 p-4 rounded-2xl">
+                                                                                          <span
+                                                                                                    class="font-bold text-slate-500">ตอบ:</span>
+                                                                                          <input type="number"
+                                                                                                    step="any"
+                                                                                                    id="q1-ans"
+                                                                                                    class="w-full sm:w-64 px-4 py-3 text-lg border-2 border-slate-200 rounded-xl focus:outline-none focus:border-pink-500 text-center font-bold text-pink-700 transition-all"
+                                                                                                    placeholder="ตัวเลข">
+                                                                                          <span id="q1-unit"
+                                                                                                    class="font-bold text-slate-600 text-xl w-12"></span>
+                                                                                </div>
+                                                                      </div>
+                                                            </div>
+                                                  </div>
+
+                                                  <div
+                                                            class="bg-white p-6 sm:p-8 rounded-3xl border-2 border-slate-100 shadow-md">
+                                                            <div class="flex items-start">
+                                                                      <div
+                                                                                class="bg-slate-100 text-slate-600 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mr-4 shrink-0">
+                                                                                2</div>
+                                                                      <div class="w-full">
+                                                                                <p class="text-xl sm:text-2xl font-medium text-slate-800 mb-6"
+                                                                                          id="q2-text">โหลดโจทย์...</p>
+                                                                                <div
+                                                                                          class="flex flex-col sm:flex-row items-center gap-4 bg-slate-50 p-4 rounded-2xl">
+                                                                                          <span
+                                                                                                    class="font-bold text-slate-500">ตอบ:</span>
+                                                                                          <input type="number"
+                                                                                                    step="any"
+                                                                                                    id="q2-ans"
+                                                                                                    class="w-full sm:w-64 px-4 py-3 text-lg border-2 border-slate-200 rounded-xl focus:outline-none focus:border-pink-500 text-center font-bold text-pink-700 transition-all"
+                                                                                                    placeholder="ตัวเลข">
+                                                                                          <span id="q2-unit"
+                                                                                                    class="font-bold text-slate-600 text-xl w-12"></span>
+                                                                                </div>
+                                                                      </div>
+                                                            </div>
+                                                  </div>
+                                        </div>
+
+                                        <div class="text-center mt-10">
+                                                  <button onclick="submitStage3()"
+                                                            class="bg-emerald-500 hover:bg-emerald-600 text-white py-4 px-12 rounded-2xl font-bold shadow-xl transition-all hover:-translate-y-1 text-xl">ส่งคำตอบ
+                                                            และจบการทดสอบ <i
+                                                                      class="fas fa-flag-checkered ml-2"></i></button>
+                                        </div>
+                              </div>
+
+                              <!-- RESULT SCREEN -->
+                              <div id="result-screen" class="hidden py-8 relative">
+                                        <div class="text-center mb-8 relative z-10">
+                                                  <i
+                                                            class="fas fa-trophy text-7xl sm:text-8xl text-yellow-400 mb-6 drop-shadow-xl animate-[bounce_2s_infinite]"></i>
+                                                  <h2
+                                                            class="text-4xl sm:text-5xl font-black text-slate-800 tracking-tight">
+                                                            สรุปผลการทดสอบ</h2>
+                                        </div>
+
+                                        <div
+                                                  class="bg-white rounded-[2rem] p-8 max-w-lg mx-auto shadow-2xl border border-slate-100 relative z-10">
+                                                  <div
+                                                            class="text-center mb-8 pb-6 border-b-2 border-slate-100 border-dashed">
+                                                            <p class="text-2xl font-bold text-indigo-700 mb-1"
+                                                                      id="res-name"></p>
+                                                            <p class="text-slate-500 font-medium text-lg">ม.4/<span
+                                                                                id="res-class"></span> เลขที่ <span
+                                                                                id="res-roll"></span></p>
+                                                  </div>
+
+                                                  <div class="space-y-4 mb-8">
+                                                            <div
+                                                                      class="flex justify-between items-center bg-slate-50 px-5 py-4 rounded-2xl border border-slate-100">
+                                                                      <span class="text-slate-600 font-bold">ด่าน 1
+                                                                                (หน่วยฐาน)</span>
+                                                                      <span class="font-black text-xl text-slate-800"><span
+                                                                                          id="res-s1"></span> <span
+                                                                                          class="text-sm text-slate-400 font-normal">/
+                                                                                          5</span></span>
+                                                            </div>
+                                                            <div
+                                                                      class="flex justify-between items-center bg-slate-50 px-5 py-4 rounded-2xl border border-slate-100">
+                                                                      <span class="text-slate-600 font-bold">ด่าน 2
+                                                                                (คำอุปสรรค)</span>
+                                                                      <span class="font-black text-xl text-slate-800"><span
+                                                                                          id="res-s2"></span> <span
+                                                                                          class="text-sm text-slate-400 font-normal">/
+                                                                                          5</span></span>
+                                                            </div>
+                                                            <div
+                                                                      class="flex justify-between items-center bg-slate-50 px-5 py-4 rounded-2xl border border-slate-100">
+                                                                      <span class="text-slate-600 font-bold">ด่าน 3
+                                                                                (แปลงหน่วย)</span>
+                                                                      <span class="font-black text-xl text-slate-800"><span
+                                                                                          id="res-s3"></span> <span
+                                                                                          class="text-sm text-slate-400 font-normal">/
+                                                                                          5</span></span>
+                                                            </div>
+                                                            <div
+                                                                      class="flex justify-between items-center bg-rose-50 px-5 py-4 rounded-2xl border border-rose-100">
+                                                                      <div class="flex flex-col">
+                                                                                <span
+                                                                                          class="text-rose-600 font-bold flex items-center"><i
+                                                                                                    class="fas fa-stopwatch mr-2"></i>เวลา
+                                                                                          (<span
+                                                                                                    id="res-time-text"></span>
+                                                                                          นาที)</span>
+                                                                                <span
+                                                                                          class="text-xs text-rose-500 mt-1 font-medium">*คะแนนเวลาสุทธิ
+                                                                                          (หักตามสัดส่วนความถูกต้อง)</span>
+                                                                      </div>
+                                                                      <span class="font-black text-xl text-rose-600"><span
+                                                                                          id="res-time"></span> <span
+                                                                                          class="text-sm text-rose-400 font-normal">/
+                                                                                          5</span></span>
+                                                            </div>
+                                                  </div>
+
+                                                  <div
+                                                            class="bg-slate-900 rounded-2xl p-6 shadow-inner text-white flex justify-between items-center">
+                                                            <span
+                                                                      class="text-2xl font-black uppercase tracking-wider text-slate-300">คะแนนรวม</span>
+                                                            <div class="flex items-baseline">
+                                                                      <span class="text-5xl font-black text-emerald-400 drop-shadow-md"
+                                                                                id="res-total"></span>
+                                                                      <span
+                                                                                class="text-2xl text-slate-500 font-bold ml-2">/
+                                                                                20</span>
+                                                            </div>
+                                                  </div>
+                                        </div>
+
+                                        <div class="text-center mt-12 relative z-10">
+                                                  <button onclick="resetGame()"
+                                                            class="bg-white hover:bg-slate-50 text-slate-800 py-4 px-10 rounded-2xl font-bold shadow-xl border border-slate-200 transition-all hover:-translate-y-1 text-lg">
+                                                            <i class="fas fa-home mr-2 text-indigo-500"></i>กลับหน้าหลัก
+                                                  </button>
+                                        </div>
+                              </div>
+
+                    </div>
+          </div>
+
+          <!-- Modal Message -->
+          <div id="modal"
+                    class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex justify-center items-center hidden z-[100]">
+                    <div class="bg-white p-8 rounded-3xl shadow-2xl text-center max-w-sm w-full mx-4 transform scale-95 transition-all duration-300 opacity-0"
+                              id="modal-content">
+                              <div id="modal-icon" class="text-5xl mb-4"></div>
+                              <h3 id="modal-title" class="text-2xl font-black mb-3"></h3>
+                              <p id="modal-msg" class="text-slate-600 mb-8 text-lg font-medium leading-relaxed"></p>
+                              <button onclick="closeModal()"
+                                        class="w-full bg-slate-800 hover:bg-slate-900 text-white py-4 px-6 rounded-xl font-bold text-lg shadow-md transition-colors">ตกลง</button>
+                    </div>
+          </div>
+
+          <script src="js/data.js"></script>
+          <script src="js/app.js"></script>
+</body>
+
+</html>
