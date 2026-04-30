@@ -5,6 +5,7 @@
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Physics Coolnut: SI Units & Conversions</title>
+          <link rel="icon" type="image/png" href="img/logo-lesson1.png">
           <script src="https://cdn.tailwindcss.com"></script>
           <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
           <link href="css/style.css" rel="stylesheet">
@@ -31,8 +32,8 @@
                               </div>
 
                               <div class="relative z-10">
-                                        <h1 class="text-4xl sm:text-5xl font-black mb-3 tracking-tight"><i
-                                                            class="fas fa-atom mr-4 animate-[spin_10s_linear_infinite]"></i>Physics
+                                        <h1 class="text-4xl sm:text-5xl font-black mb-3 tracking-tight flex items-center justify-center"><img
+                                                            src="img/logo-lesson1.png" alt="Physics Coolnut Logo" class="w-12 h-12 sm:w-16 sm:h-16 mr-4 rounded-full object-cover shadow-lg border-2 border-white/50 hover:scale-110 transition-transform bg-white">Physics
                                                   Coolnut</h1>
                                         <p
                                                   class="text-xl sm:text-2xl text-white/90 font-medium bg-black/20 inline-block px-6 py-2 rounded-full backdrop-blur-sm">
@@ -114,7 +115,7 @@
                                                                                 class="text-2xl font-black mb-1 tracking-wider">
                                                                                 โหมดทดสอบ</h3>
                                                                       <p class="text-sm font-medium opacity-90">
-                                                                                จับเวลาจริง เก็บ 20 คะแนน</p>
+                                                                                จับเวลาจริง เก็บ 10 คะแนน</p>
                                                             </div>
                                                   </button>
                                         </div>
@@ -356,8 +357,16 @@
                                         <div
                                                   class="bg-white p-8 sm:p-12 rounded-3xl border border-amber-100 shadow-lg text-center max-w-3xl mx-auto">
                                                   <span
-                                                            class="inline-block px-4 py-1.5 bg-amber-100 text-amber-800 rounded-full text-sm font-bold mb-6">ระบบสุ่มโจทย์
+                                                            class="inline-block px-4 py-1.5 bg-amber-100 text-amber-800 rounded-full text-sm font-bold mb-4">ระบบสุ่มโจทย์
                                                             20 รูปแบบ</span>
+
+                                                  <div class="mb-8 mx-auto max-w-xl bg-blue-50 p-4 rounded-xl border border-blue-100 text-left flex items-start">
+                                                            <i class="fas fa-lightbulb text-blue-500 mt-1 mr-3 text-lg"></i>
+                                                            <p class="text-sm text-blue-800 font-medium leading-relaxed">
+                                                                      <b>เทคนิคการตอบ:</b> หากคำตอบมีค่าน้อยมากๆ ให้พิมพ์ทศนิยมเรียงไปได้เลย (เช่น <code class="bg-white px-1 rounded text-blue-600">0.0000000x</code>)<br>
+                                                                      และถ้าค่ามีจำนวนมาก ให้พิมพ์เลขศูนย์ต่อท้ายให้ครบ (เช่น <code class="bg-white px-1 rounded text-blue-600">10000000</code>) โดยไม่ต้องใส่ลูกน้ำ
+                                                            </p>
+                                                  </div>
 
                                                   <p class="text-2xl sm:text-3xl font-medium text-slate-800 mb-10 leading-relaxed"
                                                             id="prac-q-text">โหลดโจทย์...</p>
@@ -444,9 +453,9 @@
                                                                                 class="fas fa-info-circle text-blue-500 mt-1 mr-3 text-lg"></i>
                                                                       <p
                                                                                 class="text-sm text-blue-800 font-medium leading-relaxed">
-                                                                                กติกาการให้คะแนน: ด่านละ 5 คะแนน (รวม 15
+                                                                                กติกาการให้คะแนน: ด่านละ 2.5 คะแนน (รวม 7.5
                                                                                 คะแนน) <br>
-                                                                                + คะแนนเวลา 5 คะแนน (ทำเสร็จไว
+                                                                                + คะแนนเวลา 2.5 คะแนน (ทำเสร็จไว
                                                                                 ได้คะแนนเยอะ
                                                                                 <b>แต่จะถูกนำไปคูณกับความถูกต้องของด่านอื่นๆ
                                                                                           ห้ามกดมั่วนะ!</b>)
@@ -480,7 +489,7 @@
                                                   </div>
                                                   <div id="s1-score-badge"
                                                             class="bg-blue-100 text-blue-800 px-4 py-2 rounded-xl border border-blue-200 font-bold whitespace-nowrap shadow-sm">
-                                                            คะแนนด่านนี้: 5
+                                                            คะแนนด่านนี้: 2.5
                                                   </div>
                                                   <button id="s1-back-btn" onclick="showScreen('practice-menu-screen')"
                                                             class="hidden bg-slate-100 hover:bg-slate-200 text-slate-600 py-2 px-6 rounded-xl font-bold transition-colors">กลับหน้าซ้อม</button>
@@ -526,7 +535,7 @@
                                                   </div>
                                                   <div id="s2-score-badge"
                                                             class="bg-purple-100 text-purple-800 px-4 py-2 rounded-xl border border-purple-200 font-bold whitespace-nowrap shadow-sm">
-                                                            คะแนนด่านนี้: 5
+                                                            คะแนนด่านนี้: 2.5
                                                   </div>
                                                   <button id="s2-back-btn" onclick="showScreen('practice-menu-screen')"
                                                             class="hidden bg-slate-100 hover:bg-slate-200 text-slate-600 py-2 px-6 rounded-xl font-bold transition-colors">กลับหน้าซ้อม</button>
@@ -568,8 +577,14 @@
                                                                       class="text-2xl sm:text-3xl font-bold text-pink-600 mb-1">
                                                                       ด่านที่ 3: ประยุกต์การแปลงหน่วย</h2>
                                                             <p class="text-slate-500 font-medium text-sm sm:text-base">
-                                                                      พิมพ์เฉพาะ <b>ตัวเลข</b> ลงในช่องว่าง (ข้อละ 2.5
+                                                                      พิมพ์เฉพาะ <b>ตัวเลข</b> ลงในช่องว่าง (ข้อละ 1.25
                                                                       คะแนน)</p>
+                                                            <div class="mt-4 bg-blue-50 p-3 rounded-xl border border-blue-100 flex items-start max-w-lg">
+                                                                      <i class="fas fa-lightbulb text-blue-500 mt-0.5 mr-2"></i>
+                                                                      <p class="text-xs text-blue-800 font-medium leading-relaxed">
+                                                                                <b>คำแนะนำ:</b> ถ้าน้อยมากๆ ให้พิมพ์ทศนิยมเรียงไปเลย (เช่น <code class="bg-white px-1 rounded text-blue-600">0.0000000x</code>) และถ้าค่าเยอะมาก ให้พิมพ์เลขเต็มๆ (เช่น <code class="bg-white px-1 rounded text-blue-600">10000000</code>) โดยไม่ต้องใส่ลูกน้ำ
+                                                                      </p>
+                                                            </div>
                                                   </div>
                                         </div>
 
@@ -698,7 +713,7 @@
                                                                       <span class="font-black text-xl text-rose-600"><span
                                                                                           id="res-time"></span> <span
                                                                                           class="text-sm text-rose-400 font-normal">/
-                                                                                          5</span></span>
+                                                                                          2.5</span></span>
                                                             </div>
                                                   </div>
 
@@ -711,7 +726,7 @@
                                                                                 id="res-total"></span>
                                                                       <span
                                                                                 class="text-2xl text-slate-500 font-bold ml-2">/
-                                                                                20</span>
+                                                                                10</span>
                                                             </div>
                                                   </div>
                                         </div>

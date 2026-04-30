@@ -144,12 +144,13 @@ function checkPracticeAnswer() {
         return;
     }
     let userAns = parseFloat(inputVal);
-    let isCorrect = Math.abs(userAns - pracCurrentAns) < 1e-4;
+    let diff = Math.abs(userAns - pracCurrentAns);
+    let isCorrect = diff < 1e-8 || (diff / Math.abs(pracCurrentAns)) <= 1e-3;
     
     let feedbackEl = document.getElementById('prac-feedback');
     feedbackEl.classList.remove('hidden');
     
-    let displayAns = parseFloat(pracCurrentAns.toFixed(6));
+    let displayAns = Number(pracCurrentAns.toPrecision(10));
     
     if (isCorrect) {
         feedbackEl.className = 'mt-6 p-6 rounded-2xl text-xl animate-[fadeIn_0.3s_ease-out] bg-emerald-50 text-emerald-800 font-bold border-2 border-emerald-200';
@@ -205,11 +206,11 @@ function stopTimer() {
 }
 
 function calcTimeScore(seconds) {
-    if (seconds <= 120) return 5;
-    if (seconds <= 180) return 4;
-    if (seconds <= 240) return 3;
-    if (seconds <= 300) return 2;
-    return 1;
+    if (seconds <= 120) return 2.5;
+    if (seconds <= 180) return 2;
+    if (seconds <= 240) return 1.5;
+    if (seconds <= 300) return 1;
+    return 0.5;
 }
 
 // Exam Logic
@@ -381,7 +382,7 @@ function initPracticeStage1() {
 
 function submitStage1() {
     if (userPairs.length < s1ActiveData.length) return showModal('แจ้งเตือน', 'จับคู่ให้ครบก่อนส่งคำตอบ', 'error');
-    scores.s1 = calculateMatchScore(s1ActiveData, 5);
+    scores.s1 = calculateMatchScore(s1ActiveData, 2.5);
     showModal('เยี่ยมมาก!', `ไปต่อด่านที่ 2 กันเลย`, 'success');
     initStage2();
     showScreen('stage-2-screen');
@@ -428,7 +429,7 @@ function initPracticeStage2() {
 
 function submitStage2() {
     if (userPairs.length < s2ActiveData.length) return showModal('แจ้งเตือน', 'จับคู่ให้ครบก่อนส่งคำตอบ', 'error');
-    scores.s2 = calculateMatchScore(s2ActiveData, 5);
+    scores.s2 = calculateMatchScore(s2ActiveData, 2.5);
     showModal('เก่งมาก!', `เตรียมพบกับด่านสุดท้าย`, 'success');
     initStage3();
     showScreen('stage-3-screen');
@@ -457,8 +458,10 @@ function submitStage3() {
     if (userQ1 === '' || userQ2 === '') return showModal('แจ้งเตือน', 'เติมตัวเลขคำตอบให้ครบ 2 ข้อ', 'error');
 
     scores.s3 = 0;
-    if (Math.abs(parseFloat(userQ1) - s3Q1Ans) < 1e-4) scores.s3 += 2.5;
-    if (Math.abs(parseFloat(userQ2) - s3Q2Ans) < 1e-4) scores.s3 += 2.5;
+    let diffQ1 = Math.abs(parseFloat(userQ1) - s3Q1Ans);
+    let diffQ2 = Math.abs(parseFloat(userQ2) - s3Q2Ans);
+    if (diffQ1 < 1e-8 || (diffQ1 / Math.abs(s3Q1Ans)) <= 1e-3) scores.s3 += 1.25;
+    if (diffQ2 < 1e-8 || (diffQ2 / Math.abs(s3Q2Ans)) <= 1e-3) scores.s3 += 1.25;
 
     showFinalResult();
 }
@@ -468,7 +471,7 @@ function showFinalResult() {
     let rawTimeScore = calcTimeScore(elapsedSecs);
     
     let contentScore = scores.s1 + scores.s2 + scores.s3;
-    let accuracy = contentScore / 15; // Max score from content is 15
+    let accuracy = contentScore / 7.5; // Max score from content is 7.5
     let finalTimeScore = rawTimeScore * accuracy; // Scale time score by accuracy
     
     document.getElementById('res-name').innerText = `${student.name} ${student.surname}`;
@@ -481,10 +484,10 @@ function showFinalResult() {
     let mins = Math.floor(elapsedSecs / 60);
     let secs = elapsedSecs % 60;
     document.getElementById('res-time-text').innerText = `${mins}:${secs.toString().padStart(2, '0')}`;
-    document.getElementById('res-time').innerText = finalTimeScore.toFixed(1);
+    document.getElementById('res-time').innerText = Number(finalTimeScore.toFixed(2)).toString();
 
     let total = contentScore + finalTimeScore;
-    document.getElementById('res-total').innerText = Math.round(total).toString();
+    document.getElementById('res-total').innerText = Number(total.toFixed(2)).toString();
 
     showScreen('result-screen');
 }
