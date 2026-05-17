@@ -51,3 +51,77 @@ body {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* Responsive safety for phone/tablet/Chromebook */
+@media (max-width: 1024px) {
+    #exam-timer {
+        top: 10px !important;
+        right: 10px !important;
+        padding: 10px 14px !important;
+        font-size: 1rem !important;
+        border-radius: 14px !important;
+    }
+
+    #live-score-panel {
+        top: auto !important;
+        right: 10px !important;
+        left: 10px !important;
+        bottom: 10px !important;
+        width: auto !important;
+        font-size: 0.8rem !important;
+        line-height: 1.35 !important;
+        border-radius: 14px !important;
+        z-index: 45 !important;
+    }
+
+    #app {
+        border-radius: 1.5rem !important;
+    }
+}
+
+@media (max-width: 640px) {
+    body {
+        padding: 10px !important;
+    }
+
+    .match-btn {
+        padding: 12px 12px !important;
+        font-size: 1rem !important;
+        line-height: 1.35 !important;
+        word-break: break-word;
+    }
+
+    #stage3-questions p {
+        font-size: 1.1rem !important;
+        line-height: 1.5 !important;
+    }
+
+    #stage3-questions input[type="number"] {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    #app .min-h-\[500px\] {
+        min-height: 0 !important;
+    }
+}
+
+/* Fairness mode: mobile landscape should see both matching columns together */
+@media (orientation: landscape) and (max-width: 932px) {
+    #s1-match-wrap,
+    #s2-match-wrap {
+        flex-direction: row !important;
+        align-items: stretch;
+    }
+
+    #s1-match-wrap .match-col,
+    #s2-match-wrap .match-col {
+        width: 50% !important;
+    }
+
+    #s1-match-wrap .match-btn,
+    #s2-match-wrap .match-btn {
+        font-size: 0.95rem !important;
+        padding: 10px 10px !important;
+    }
+}

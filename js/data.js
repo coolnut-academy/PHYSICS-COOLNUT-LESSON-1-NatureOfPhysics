@@ -68,3 +68,19 @@ function generateQuestionData() {
         qType: qType
     };
 }
+
+function generateQuestionDataWithRoll(rollno = 0, questionIndex = 0) {
+    const q = generateQuestionData();
+    const safeRoll = Number.isFinite(rollno) ? Math.max(0, Math.floor(rollno)) : 0;
+    const factor = 1 + ((safeRoll + questionIndex) % 7);
+    const adjustedVal = q.val * factor;
+    const adjustedAns = (adjustedVal * q.qType.fromP) / q.qType.toP;
+
+    return {
+        text: `จง${q.qType.text} เมื่อค่าเริ่มต้นคือ <b>${adjustedVal}</b> ${q.qType.from} <span class="text-xs text-slate-500">(สุ่มจากเลขที่ ${safeRoll})</span>`,
+        val: adjustedVal,
+        unitStr: q.qType.to,
+        ans: adjustedAns,
+        qType: q.qType
+    };
+}

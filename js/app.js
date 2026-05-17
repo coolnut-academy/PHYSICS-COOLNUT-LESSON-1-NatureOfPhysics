@@ -3,6 +3,7 @@ const student = { name: '', surname: '', classroom: '', rollno: 0 };
 const scores = { s1: 0, s2: 0, s3: 0 };
 let startTime = 0;
 let timerInterval = null;
+let currentElapsedSecs = 0;
 let currentPairColor = 0;
 let userPairs = [];
 let currentLeft = null;
@@ -10,14 +11,17 @@ let currentRight = null;
 let isExamMode = false;
 let practiceMatchesDone = 0;
 
-let s3Q1Ans = 0;
-let s3Q2Ans = 0;
 let pracCurrentAns = 0;
+let s3Questions = [];
+let stageMaxScores = { s1: 2.5, s2: 2.5, s3: 2.5 };
 
 // Initialize dynamic content on load
 document.addEventListener('DOMContentLoaded', () => {
     renderTheory();
     renderExamples();
+    setLiveScoreVisibility(false);
+    resetLiveScorePanel();
+    updateLiveScore();
 });
 
 // Utility
@@ -125,6 +129,7 @@ function renderExamples() {
 function initPracticeStage3() {
     isExamMode = false;
     generatePracticeQuestion();
+    updateLiveScore();
     showScreen('practice-stage3-screen');
 }
 
@@ -143,7 +148,12 @@ function checkPracticeAnswer() {
         showModal('แจ้งเตือน', 'กรุณาเติมตัวเลขคำตอบ', 'error');
         return;
     }
-    let userAns = parseFloat(inputVal);
+    const trimmed = inputVal.trim();
+    if (!/^[+-]?\d+(\.\d+)?$/.test(trimmed)) {
+        showModal('รูปแบบคำตอบไม่ถูกต้อง', 'ให้พิมพ์เป็นเลขปกติล้วนๆ เช่น 0.000001 หรือ 1000000 (ห้ามใช้ e, ×10^, หน่วย, ลูกน้ำ)', 'error');
+        return;
+    }
+    let userAns = parseFloat(trimmed);
     let diff = Math.abs(userAns - pracCurrentAns);
     let isCorrect = diff < 1e-8 || (diff / Math.abs(pracCurrentAns)) <= 1e-3;
     
@@ -190,26 +200,34 @@ function playCuteEffect() {
 
 // Exam Timer
 function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    currentElapsedSecs = 0;
     document.getElementById('exam-timer').classList.remove('hidden');
-    timerInterval = setInterval(() => {
-        let elapsed = Math.floor((Date.now() - startTime) / 1000);
-        let mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
-        let secs = (elapsed % 60).toString().padStart(2, '0');
+    const tick = () => {
+        currentElapsedSecs = Math.floor((Date.now() - startTime) / 1000);
+        let mins = Math.floor(currentElapsedSecs / 60).toString().padStart(2, '0');
+        let secs = (currentElapsedSecs % 60).toString().padStart(2, '0');
         document.getElementById('timer-display').innerText = `${mins}:${secs}`;
-    }, 1000);
+        updateLiveScore();
+    };
+    tick();
+    timerInterval = setInterval(tick, 250);
 }
 
 function stopTimer() {
-    clearInterval(timerInterval);
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
     document.getElementById('exam-timer').classList.add('hidden');
-    return Math.floor((Date.now() - startTime) / 1000);
+    currentElapsedSecs = Math.floor((Date.now() - startTime) / 1000);
+    updateLiveScore();
+    return currentElapsedSecs;
 }
 
 function calcTimeScore(seconds) {
-    if (seconds <= 120) return 2.5;
-    if (seconds <= 180) return 2;
-    if (seconds <= 240) return 1.5;
-    if (seconds <= 300) return 1;
+    if (seconds <= 300) return 2.5;
+    if (seconds <= 360) return 2;
+    if (seconds <= 420) return 1.5;
+    if (seconds <= 480) return 1;
     return 0.5;
 }
 
@@ -223,7 +241,11 @@ function startExam(e) {
     student.rollno = parseInt(document.getElementById('rollno').value);
 
     startTime = Date.now();
+    scores.s1 = 0; scores.s2 = 0; scores.s3 = 0;
+    resetLiveScorePanel();
+    setLiveScoreVisibility(true);
     startTimer();
+    updateLiveScore();
     initStage1();
     showScreen('stage-1-screen');
 }
@@ -292,9 +314,10 @@ function handleMatchClick(btn, stageNum) {
                 currentLeft = null;
                 currentRight = null;
                 practiceMatchesDone++;
-                if (practiceMatchesDone === 5) {
+                if (practiceMatchesDone === activeData.length) {
                     setTimeout(() => showModal('เก่งมาก!', 'จับคู่ถูกต้องครบถ้วน! กดปุ่ม "สุ่มโจทย์ใหม่" เพื่อซ้อมต่อได้เลย', 'success'), 800);
                 }
+                updateLiveScore();
             } else {
                 currentLeft.classList.add('bg-rose-500', 'text-white', 'border-rose-600');
                 currentRight.classList.add('bg-rose-500', 'text-white', 'border-rose-600');
@@ -328,11 +351,13 @@ function handleMatchClick(btn, stageNum) {
             userPairs.push({ id: pairId, leftId: currentLeft.dataset.id, rightId: currentRight.dataset.id });
             currentLeft = null;
             currentRight = null;
+            updateLiveScore();
         }
     }
 }
 
 function calculateMatchScore(correctData, maxScore) {
+    if (!correctData || !correctData.length) return 0;
     let correctCount = 0;
     userPairs.forEach(pair => {
         let leftItem = correctData.find(item => item.id === pair.leftId);
@@ -345,9 +370,13 @@ function calculateMatchScore(correctData, maxScore) {
 let s1ActiveData = [];
 
 function generateStage1Data() {
-    let shuffledSI = shuffle([...siUnits]).slice(0, 5);
+    let shuffledSI = shuffle([...siUnits]);
     let currentS1Data = [];
     let currentS1Answers = [];
+    const distractorUnits = [
+        'นิวตัน (N)', 'จูล (J)', 'วัตต์ (W)', 'โวลต์ (V)',
+        'เฮิรตซ์ (Hz)', 'ปาสกาล (Pa)'
+    ];
     
     shuffledSI.forEach((item, index) => {
         let idLeft = 'l' + index;
@@ -355,10 +384,19 @@ function generateStage1Data() {
         currentS1Data.push({ id: idLeft, text: item.name, matchId: idRight });
         currentS1Answers.push({ id: idRight, text: item.unit });
     });
+    shuffle(distractorUnits).slice(0, 3).forEach((unit, idx) => {
+        currentS1Answers.push({ id: 'd' + idx, text: unit });
+    });
     return { dataLeft: currentS1Data, dataRight: currentS1Answers };
 }
 
 function initStage1() { 
+    document.getElementById('s1-title').innerText = "ด่านที่ 1: จับคู่หน่วยฐาน SI";
+    document.getElementById('s1-desc').innerHTML = 'คลิกเลือก "ปริมาณ" และ "หน่วย" ให้ถูกต้องตรงกัน';
+    document.getElementById('s1-score-badge').classList.remove('hidden');
+    document.getElementById('s1-submit-btn').classList.remove('hidden');
+    document.getElementById('s1-back-btn').classList.add('hidden');
+    document.getElementById('s1-random-btn').classList.add('hidden');
     let generated = generateStage1Data();
     s1ActiveData = generated.dataLeft;
     createMatchingUI('s1-left', 's1-right', generated.dataLeft, generated.dataRight, 1); 
@@ -377,12 +415,14 @@ function initPracticeStage1() {
     let generated = generateStage1Data();
     s1ActiveData = generated.dataLeft;
     createMatchingUI('s1-left', 's1-right', generated.dataLeft, generated.dataRight, 1);
+    updateLiveScore();
     showScreen('stage-1-screen');
 }
 
 function submitStage1() {
     if (userPairs.length < s1ActiveData.length) return showModal('แจ้งเตือน', 'จับคู่ให้ครบก่อนส่งคำตอบ', 'error');
-    scores.s1 = calculateMatchScore(s1ActiveData, 2.5);
+    scores.s1 = calculateMatchScore(s1ActiveData, stageMaxScores.s1);
+    updateLiveScore();
     showModal('เยี่ยมมาก!', `ไปต่อด่านที่ 2 กันเลย`, 'success');
     initStage2();
     showScreen('stage-2-screen');
@@ -392,7 +432,7 @@ function submitStage1() {
 let s2ActiveData = [];
 
 function generateStage2Data() {
-    let shuffledPrefixes = shuffle([...prefixes]).slice(0, 5);
+    let shuffledPrefixes = shuffle([...prefixes]);
     let currentS2Data = [];
     let currentS2Answers = [];
     
@@ -406,6 +446,12 @@ function generateStage2Data() {
 }
 
 function initStage2() { 
+    document.getElementById('s2-title').innerText = "ด่านที่ 2: จับคู่คำอุปสรรค";
+    document.getElementById('s2-desc').innerHTML = "จับคู่ชื่อคำอุปสรรค กับ ตัวเลขพหุคูณให้ถูกต้อง";
+    document.getElementById('s2-score-badge').classList.remove('hidden');
+    document.getElementById('s2-submit-btn').classList.remove('hidden');
+    document.getElementById('s2-back-btn').classList.add('hidden');
+    document.getElementById('s2-random-btn').classList.add('hidden');
     let generated = generateStage2Data();
     s2ActiveData = generated.dataLeft;
     createMatchingUI('s2-left', 's2-right', generated.dataLeft, generated.dataRight, 2); 
@@ -424,12 +470,14 @@ function initPracticeStage2() {
     let generated = generateStage2Data();
     s2ActiveData = generated.dataLeft;
     createMatchingUI('s2-left', 's2-right', generated.dataLeft, generated.dataRight, 2);
+    updateLiveScore();
     showScreen('stage-2-screen');
 }
 
 function submitStage2() {
     if (userPairs.length < s2ActiveData.length) return showModal('แจ้งเตือน', 'จับคู่ให้ครบก่อนส่งคำตอบ', 'error');
-    scores.s2 = calculateMatchScore(s2ActiveData, 2.5);
+    scores.s2 = calculateMatchScore(s2ActiveData, stageMaxScores.s2);
+    updateLiveScore();
     showModal('เก่งมาก!', `เตรียมพบกับด่านสุดท้าย`, 'success');
     initStage3();
     showScreen('stage-3-screen');
@@ -437,31 +485,55 @@ function submitStage2() {
 
 // Stage 3
 function initStage3() {
-    let q1 = generateQuestionData();
-    s3Q1Ans = q1.ans;
-    document.getElementById('q1-text').innerHTML = q1.text;
-    document.getElementById('q1-unit').innerText = q1.unitStr;
-    document.getElementById('q1-ans').value = '';
+    const wrap = document.getElementById('stage3-questions');
+    wrap.innerHTML = '';
+    s3Questions = [];
+    const qCount = 4;
+    for (let i = 0; i < qCount; i++) {
+        let q = generateQuestionDataWithRoll(student.rollno, i + 1);
+        while (s3Questions.some(existing => existing.text === q.text)) {
+            q = generateQuestionDataWithRoll(student.rollno, i + 11);
+        }
+        s3Questions.push(q);
+    }
 
-    let q2 = generateQuestionData();
-    while(q2.text === q1.text) { q2 = generateQuestionData(); }
-    s3Q2Ans = q2.ans;
-    document.getElementById('q2-text').innerHTML = q2.text;
-    document.getElementById('q2-unit').innerText = q2.unitStr;
-    document.getElementById('q2-ans').value = '';
+    s3Questions.forEach((q, idx) => {
+        const qNo = idx + 1;
+        wrap.innerHTML += `
+        <div class="bg-white p-6 sm:p-8 rounded-3xl border-2 border-slate-100 shadow-md">
+            <div class="flex items-start">
+                <div class="bg-slate-100 text-slate-600 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mr-4 shrink-0">${qNo}</div>
+                <div class="w-full">
+                    <p class="text-xl sm:text-2xl font-medium text-slate-800 mb-6">${q.text}</p>
+                    <div class="flex flex-col sm:flex-row items-center gap-4 bg-slate-50 p-4 rounded-2xl">
+                        <span class="font-bold text-slate-500">ตอบ:</span>
+                        <input type="number" step="any" id="q${qNo}-ans" oninput="updateLiveScore()"
+                            class="w-full sm:w-64 px-4 py-3 text-lg border-2 border-slate-200 rounded-xl focus:outline-none focus:border-pink-500 text-center font-bold text-pink-700 transition-all"
+                            placeholder="เช่น 0.000001 หรือ 1000000">
+                        <span class="font-bold text-slate-600 text-xl w-12">${q.unitStr}</span>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    });
+    updateLiveScore();
 }
 
 function submitStage3() {
-    let userQ1 = document.getElementById('q1-ans').value;
-    let userQ2 = document.getElementById('q2-ans').value;
-
-    if (userQ1 === '' || userQ2 === '') return showModal('แจ้งเตือน', 'เติมตัวเลขคำตอบให้ครบ 2 ข้อ', 'error');
-
+    const inputs = s3Questions.map((_, idx) => document.getElementById(`q${idx + 1}-ans`).value);
+    if (inputs.some(v => v === '')) return showModal('แจ้งเตือน', `เติมตัวเลขคำตอบให้ครบ ${s3Questions.length} ข้อ`, 'error');
+    const invalid = inputs.some(v => !/^[+-]?\d+(\.\d+)?$/.test(v.trim()));
+    if (invalid) {
+        return showModal('รูปแบบคำตอบไม่ถูกต้อง', 'ด่าน 3 ต้องพิมพ์เลขปกติล้วนๆ เช่น 0.000001 หรือ 1000000 (ห้ามใช้ e, ×10^, หน่วย, ลูกน้ำ)', 'error');
+    }
     scores.s3 = 0;
-    let diffQ1 = Math.abs(parseFloat(userQ1) - s3Q1Ans);
-    let diffQ2 = Math.abs(parseFloat(userQ2) - s3Q2Ans);
-    if (diffQ1 < 1e-8 || (diffQ1 / Math.abs(s3Q1Ans)) <= 1e-3) scores.s3 += 1.25;
-    if (diffQ2 < 1e-8 || (diffQ2 / Math.abs(s3Q2Ans)) <= 1e-3) scores.s3 += 1.25;
+    const eachScore = stageMaxScores.s3 / s3Questions.length;
+    s3Questions.forEach((q, idx) => {
+        const userAns = parseFloat(inputs[idx].trim());
+        const diff = Math.abs(userAns - q.ans);
+        if (diff < 1e-8 || (diff / Math.abs(q.ans)) <= 1e-3) scores.s3 += eachScore;
+    });
+    updateLiveScore();
 
     showFinalResult();
 }
@@ -472,7 +544,8 @@ function showFinalResult() {
     
     let contentScore = scores.s1 + scores.s2 + scores.s3;
     let accuracy = contentScore / 7.5; // Max score from content is 7.5
-    let finalTimeScore = rawTimeScore * accuracy; // Scale time score by accuracy
+    // Anti-random rule: if content is zero, time score must be zero.
+    let finalTimeScore = contentScore > 0 ? (rawTimeScore * accuracy) : 0;
     
     document.getElementById('res-name').innerText = `${student.name} ${student.surname}`;
     document.getElementById('res-class').innerText = student.classroom;
@@ -486,14 +559,73 @@ function showFinalResult() {
     document.getElementById('res-time-text').innerText = `${mins}:${secs.toString().padStart(2, '0')}`;
     document.getElementById('res-time').innerText = Number(finalTimeScore.toFixed(2)).toString();
 
-    let total = contentScore + finalTimeScore;
+    let total = contentScore > 0 ? (contentScore + finalTimeScore) : 0;
     document.getElementById('res-total').innerText = Number(total.toFixed(2)).toString();
 
+    setLiveScoreVisibility(false);
+    resetLiveScorePanel();
     showScreen('result-screen');
 }
 
 function resetGame() {
     document.getElementById('student-form').reset();
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+    currentElapsedSecs = 0;
+    document.getElementById('exam-timer').classList.add('hidden');
     scores.s1 = 0; scores.s2 = 0; scores.s3 = 0;
+    isExamMode = false;
+    setLiveScoreVisibility(false);
+    resetLiveScorePanel();
+    updateLiveScore();
     showScreen('menu-screen');
+}
+
+function setLiveScoreVisibility(show) {
+    const panel = document.getElementById('live-score-panel');
+    if (!panel) return;
+    panel.classList.toggle('hidden', !show);
+}
+
+function resetLiveScorePanel() {
+    const liveContent = document.getElementById('live-content-score');
+    const liveTime = document.getElementById('live-time-score');
+    const liveTotal = document.getElementById('live-total-score');
+    if (liveContent) liveContent.innerText = '0.00';
+    if (liveTime) liveTime.innerText = '0.00';
+    if (liveTotal) liveTotal.innerText = '0.00';
+}
+
+function calculateLiveStage3Score() {
+    if (!s3Questions.length) return 0;
+    let live = 0;
+    const eachScore = stageMaxScores.s3 / s3Questions.length;
+    s3Questions.forEach((q, idx) => {
+        const input = document.getElementById(`q${idx + 1}-ans`);
+        if (!input || input.value === '') return;
+        const userAns = parseFloat(input.value);
+        const diff = Math.abs(userAns - q.ans);
+        if (diff < 1e-8 || (diff / Math.abs(q.ans)) <= 1e-3) live += eachScore;
+    });
+    return live;
+}
+
+function updateLiveScore() {
+    const liveS1 = calculateMatchScore(s1ActiveData, stageMaxScores.s1);
+    const liveS2 = calculateMatchScore(s2ActiveData, stageMaxScores.s2);
+    const liveS3 = calculateLiveStage3Score();
+    const content = Math.min(stageMaxScores.s1, scores.s1 > 0 ? scores.s1 : liveS1)
+        + Math.min(stageMaxScores.s2, scores.s2 > 0 ? scores.s2 : liveS2)
+        + Math.min(stageMaxScores.s3, scores.s3 > 0 ? scores.s3 : liveS3);
+    const tScoreRaw = isExamMode ? calcTimeScore(currentElapsedSecs) : 0;
+    const accuracy = content / 7.5;
+    const timeScaled = (isExamMode && content > 0) ? (tScoreRaw * accuracy) : 0;
+    const total = content > 0 ? (content + timeScaled) : 0;
+
+    const liveContent = document.getElementById('live-content-score');
+    const liveTime = document.getElementById('live-time-score');
+    const liveTotal = document.getElementById('live-total-score');
+    if (liveContent) liveContent.innerText = content.toFixed(2);
+    if (liveTime) liveTime.innerText = timeScaled.toFixed(2);
+    if (liveTotal) liveTotal.innerText = total.toFixed(2);
 }
