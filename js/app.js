@@ -40,6 +40,23 @@ function shuffle(array) {
     return array;
 }
 
+function formatPlainNumber(value) {
+    if (!Number.isFinite(value)) return '';
+    if (value === 0) return '0';
+
+    const maxDecimals = Math.abs(value) < 1 ? 20 : 10;
+    let formatted = value.toLocaleString('en-US', {
+        useGrouping: false,
+        maximumFractionDigits: maxDecimals
+    });
+
+    if (formatted.includes('.')) {
+        formatted = formatted.replace(/\.?0+$/, '');
+    }
+
+    return formatted === '-0' ? '0' : formatted;
+}
+
 // Modals
 function showModal(title, msg, type = "info") {
     const modal = document.getElementById('modal');
@@ -101,7 +118,7 @@ function renderExamples() {
     container.innerHTML = '';
     conversionTypes.forEach((q, i) => {
         let val = (['kg', 'km', 'm', 'MW', 'GW'].includes(q.from)) ? 5 : 50;
-        let ans = (val * q.fromP) / q.toP;
+        let ans = formatPlainNumber((val * q.fromP) / q.toP);
         
         let fromPStr = formatPower(q.fromP);
         let toPStr = formatPower(q.toP);
@@ -160,7 +177,7 @@ function checkPracticeAnswer() {
     let feedbackEl = document.getElementById('prac-feedback');
     feedbackEl.classList.remove('hidden');
     
-    let displayAns = Number(pracCurrentAns.toPrecision(10));
+    let displayAns = formatPlainNumber(pracCurrentAns);
     
     if (isCorrect) {
         feedbackEl.className = 'mt-6 p-6 rounded-2xl text-xl animate-[fadeIn_0.3s_ease-out] bg-emerald-50 text-emerald-800 font-bold border-2 border-emerald-200';
