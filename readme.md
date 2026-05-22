@@ -10,10 +10,10 @@
 
 ## 🛠️ Tech Stack
 
-โปรเจกต์นี้พัฒนาด้วยเทคโนโลยีที่เน้นความรวดเร็วในการเข้าถึง (Lightweight) และรองรับการแสดงผลทุกขนาดหน้าจอ (Responsive) โดยไม่ต้องมี Build Process ที่ซับซ้อน:
+โปรเจกต์นี้พัฒนาด้วยเทคโนโลยีที่เน้นความรวดเร็วในการเข้าถึง (Lightweight) และรองรับการแสดงผลทุกขนาดหน้าจอ (Responsive):
 
 - **Core:** HTML5, Vanilla JavaScript (ES6+), CSS3
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/) (via CDN) สำหรับระบบ UI, Glassmorphism และ Custom Animations
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) ผ่าน Tailwind CLI สำหรับ production CSS, Glassmorphism และ Custom Animations
 - **Icons:** [FontAwesome 6](https://fontawesome.com/) (via CDN)
 - **Architecture:** ออกแบบโครงสร้างคล้าย Single Page Application (SPA) ผ่านการจัดการ DOM ด้วย Vanilla JS (`app.js`) พร้อมแยกระบบชุดข้อมูลข้อสอบและการสุ่มโจทย์แยกต่างหาก (`data.js`)
 
@@ -35,7 +35,7 @@
 
 - **Self-Paced Learning:** ออกแบบ UI/UX ที่สวยงามและทันสมัย ให้นักเรียนเรียนรู้ด้วยตนเองได้ง่าย
 - **Mastery Learning:** การสุ่มโจทย์แบบไม่จำกัดช่วยให้นักเรียนฝึกฝนซ้ำๆ จนเกิดทักษะ (Skill Mastery) โดยไม่ต้องรอให้ครูตั้งโจทย์ใหม่
-- **Gamification Engine:** ลดความน่าเบื่อของการทำแบบฝึกหัดบนกระดาษ ด้วยระบบจับเวลา อินเทอร์เฟซเกม และผลลัพธ์แบบ Real-time
+- **Gamification Engine:** ลดความน่าเบื่อของการทำแบบฝึกหัดบนกระดาษ ด้วยระบบนับถอยหลัง 5 นาที อินเทอร์เฟซเกม และผลลัพธ์แบบ Real-time
 - **Teacher-Friendly:** ช่วยลดภาระการตรวจงานของครู สามารถใช้สอนแบบ On-site ขึ้นหน้าจอโปรเจคเตอร์ หรือสั่งเป็น Assignment ให้เรียนรู้จากที่บ้านได้อย่างอิสระ
 
 ## 📋 Student Integration (เอกสารประกอบการสอน)

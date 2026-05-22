@@ -1,17 +1,21 @@
 // State Management
 const student = { name: '', surname: '', classroom: '', rollno: 0 };
 const scores = { s1: 0, s2: 0, s3: 0 };
+const EXAM_DURATION_SECS = 5 * 60;
 let startTime = 0;
 let timerInterval = null;
 let currentElapsedSecs = 0;
+let currentRemainingSecs = EXAM_DURATION_SECS;
 let currentPairColor = 0;
 let userPairs = [];
 let currentLeft = null;
 let currentRight = null;
 let isExamMode = false;
+let isResultShown = false;
 let practiceMatchesDone = 0;
 
 let pracCurrentAns = 0;
+let pracCurrentAnsText = '0';
 let s3Questions = [];
 let stageMaxScores = { s1: 2.5, s2: 2.5, s3: 2.5 };
 
@@ -44,17 +48,36 @@ function formatPlainNumber(value) {
     if (!Number.isFinite(value)) return '';
     if (value === 0) return '0';
 
-    const maxDecimals = Math.abs(value) < 1 ? 20 : 10;
-    let formatted = value.toLocaleString('en-US', {
-        useGrouping: false,
-        maximumFractionDigits: maxDecimals
-    });
+    const cleaned = Number(value.toPrecision(14));
+    const formattedFromPrecision = cleaned.toPrecision(14).replace(/\.?0+$/, '');
+    let formatted = formattedFromPrecision.includes('e')
+        ? cleaned.toLocaleString('en-US', {
+            useGrouping: false,
+            maximumFractionDigits: 20
+        })
+        : formattedFromPrecision;
 
     if (formatted.includes('.')) {
         formatted = formatted.replace(/\.?0+$/, '');
     }
 
     return formatted === '-0' ? '0' : formatted;
+}
+
+function isPlainDecimalInput(value) {
+    return /^[+-]?(?:\d+(\.\d+)?|\.\d+)$/.test(value.trim());
+}
+
+function isAnswerCorrect(userInput, correctAnswer) {
+    const trimmed = userInput.trim();
+    if (!isPlainDecimalInput(trimmed)) return false;
+
+    const userAns = Number(trimmed);
+    if (!Number.isFinite(userAns)) return false;
+
+    const diff = Math.abs(userAns - correctAnswer);
+    const tolerance = Math.max(1e-10, Math.abs(correctAnswer) * 1e-3);
+    return diff <= tolerance;
 }
 
 // Modals
@@ -153,6 +176,7 @@ function initPracticeStage3() {
 function generatePracticeQuestion() {
     let q = generateQuestionData();
     pracCurrentAns = q.ans;
+    pracCurrentAnsText = q.ansText || formatPlainNumber(q.ans);
     document.getElementById('prac-q-text').innerHTML = q.text;
     document.getElementById('prac-ans-input').value = '';
     document.getElementById('prac-feedback').classList.add('hidden');
@@ -166,18 +190,16 @@ function checkPracticeAnswer() {
         return;
     }
     const trimmed = inputVal.trim();
-    if (!/^[+-]?\d+(\.\d+)?$/.test(trimmed)) {
+    if (!isPlainDecimalInput(trimmed)) {
         showModal('รูปแบบคำตอบไม่ถูกต้อง', 'ให้พิมพ์เป็นเลขปกติล้วนๆ เช่น 0.000001 หรือ 1000000 (ห้ามใช้ e, ×10^, หน่วย, ลูกน้ำ)', 'error');
         return;
     }
-    let userAns = parseFloat(trimmed);
-    let diff = Math.abs(userAns - pracCurrentAns);
-    let isCorrect = diff < 1e-8 || (diff / Math.abs(pracCurrentAns)) <= 1e-3;
+    let isCorrect = isAnswerCorrect(trimmed, pracCurrentAns);
     
     let feedbackEl = document.getElementById('prac-feedback');
     feedbackEl.classList.remove('hidden');
     
-    let displayAns = formatPlainNumber(pracCurrentAns);
+    let displayAns = pracCurrentAnsText;
     
     if (isCorrect) {
         feedbackEl.className = 'mt-6 p-6 rounded-2xl text-xl animate-[fadeIn_0.3s_ease-out] bg-emerald-50 text-emerald-800 font-bold border-2 border-emerald-200';
@@ -215,17 +237,23 @@ function playCuteEffect() {
     }
 }
 
-// Exam Timer
+// Exam Countdown Timer
 function startTimer() {
     if (timerInterval) clearInterval(timerInterval);
     currentElapsedSecs = 0;
+    currentRemainingSecs = EXAM_DURATION_SECS;
     document.getElementById('exam-timer').classList.remove('hidden');
     const tick = () => {
-        currentElapsedSecs = Math.floor((Date.now() - startTime) / 1000);
-        let mins = Math.floor(currentElapsedSecs / 60).toString().padStart(2, '0');
-        let secs = (currentElapsedSecs % 60).toString().padStart(2, '0');
+        currentElapsedSecs = Math.min(Math.floor((Date.now() - startTime) / 1000), EXAM_DURATION_SECS);
+        currentRemainingSecs = Math.max(EXAM_DURATION_SECS - currentElapsedSecs, 0);
+        let mins = Math.floor(currentRemainingSecs / 60).toString().padStart(2, '0');
+        let secs = (currentRemainingSecs % 60).toString().padStart(2, '0');
         document.getElementById('timer-display').innerText = `${mins}:${secs}`;
         updateLiveScore();
+
+        if (currentRemainingSecs <= 0) {
+            handleExamTimeout();
+        }
     };
     tick();
     timerInterval = setInterval(tick, 250);
@@ -235,17 +263,19 @@ function stopTimer() {
     if (timerInterval) clearInterval(timerInterval);
     timerInterval = null;
     document.getElementById('exam-timer').classList.add('hidden');
-    currentElapsedSecs = Math.floor((Date.now() - startTime) / 1000);
+    currentElapsedSecs = Math.min(Math.floor((Date.now() - startTime) / 1000), EXAM_DURATION_SECS);
+    currentRemainingSecs = Math.max(EXAM_DURATION_SECS - currentElapsedSecs, 0);
     updateLiveScore();
     return currentElapsedSecs;
 }
 
 function calcTimeScore(seconds) {
-    if (seconds <= 300) return 2.5;
-    if (seconds <= 360) return 2;
-    if (seconds <= 420) return 1.5;
-    if (seconds <= 480) return 1;
-    return 0.5;
+    return seconds <= EXAM_DURATION_SECS ? 2.5 : 0;
+}
+
+function handleExamTimeout() {
+    if (!isExamMode || isResultShown) return;
+    showFinalResult();
 }
 
 // Exam Logic
@@ -259,6 +289,7 @@ function startExam(e) {
 
     startTime = Date.now();
     scores.s1 = 0; scores.s2 = 0; scores.s3 = 0;
+    isResultShown = false;
     resetLiveScorePanel();
     setLiveScoreVisibility(true);
     startTimer();
@@ -437,6 +468,7 @@ function initPracticeStage1() {
 }
 
 function submitStage1() {
+    if (isResultShown) return;
     if (userPairs.length < s1ActiveData.length) return showModal('แจ้งเตือน', 'จับคู่ให้ครบก่อนส่งคำตอบ', 'error');
     scores.s1 = calculateMatchScore(s1ActiveData, stageMaxScores.s1);
     updateLiveScore();
@@ -492,6 +524,7 @@ function initPracticeStage2() {
 }
 
 function submitStage2() {
+    if (isResultShown) return;
     if (userPairs.length < s2ActiveData.length) return showModal('แจ้งเตือน', 'จับคู่ให้ครบก่อนส่งคำตอบ', 'error');
     scores.s2 = calculateMatchScore(s2ActiveData, stageMaxScores.s2);
     updateLiveScore();
@@ -506,13 +539,8 @@ function initStage3() {
     wrap.innerHTML = '';
     s3Questions = [];
     const qCount = 4;
-    for (let i = 0; i < qCount; i++) {
-        let q = generateQuestionDataWithRoll(student.rollno, i + 1);
-        while (s3Questions.some(existing => existing.text === q.text)) {
-            q = generateQuestionDataWithRoll(student.rollno, i + 11);
-        }
-        s3Questions.push(q);
-    }
+    const selectedTypes = shuffle([...conversionTypes]).slice(0, qCount);
+    s3Questions = selectedTypes.map((qType, idx) => generateQuestionDataWithRoll(student.rollno, idx + 1, qType));
 
     s3Questions.forEach((q, idx) => {
         const qNo = idx + 1;
@@ -524,7 +552,7 @@ function initStage3() {
                     <p class="text-xl sm:text-2xl font-medium text-slate-800 mb-6">${q.text}</p>
                     <div class="flex flex-col sm:flex-row items-center gap-4 bg-slate-50 p-4 rounded-2xl">
                         <span class="font-bold text-slate-500">ตอบ:</span>
-                        <input type="number" step="any" id="q${qNo}-ans" oninput="updateLiveScore()"
+                        <input type="text" inputmode="decimal" autocomplete="off" id="q${qNo}-ans" oninput="updateLiveScore()"
                             class="w-full sm:w-64 px-4 py-3 text-lg border-2 border-slate-200 rounded-xl focus:outline-none focus:border-pink-500 text-center font-bold text-pink-700 transition-all"
                             placeholder="เช่น 0.000001 หรือ 1000000">
                         <span class="font-bold text-slate-600 text-xl w-12">${q.unitStr}</span>
@@ -537,25 +565,55 @@ function initStage3() {
 }
 
 function submitStage3() {
+    if (isResultShown) return;
     const inputs = s3Questions.map((_, idx) => document.getElementById(`q${idx + 1}-ans`).value);
     if (inputs.some(v => v === '')) return showModal('แจ้งเตือน', `เติมตัวเลขคำตอบให้ครบ ${s3Questions.length} ข้อ`, 'error');
-    const invalid = inputs.some(v => !/^[+-]?\d+(\.\d+)?$/.test(v.trim()));
+    const invalid = inputs.some(v => !isPlainDecimalInput(v));
     if (invalid) {
         return showModal('รูปแบบคำตอบไม่ถูกต้อง', 'ด่าน 3 ต้องพิมพ์เลขปกติล้วนๆ เช่น 0.000001 หรือ 1000000 (ห้ามใช้ e, ×10^, หน่วย, ลูกน้ำ)', 'error');
     }
     scores.s3 = 0;
     const eachScore = stageMaxScores.s3 / s3Questions.length;
     s3Questions.forEach((q, idx) => {
-        const userAns = parseFloat(inputs[idx].trim());
-        const diff = Math.abs(userAns - q.ans);
-        if (diff < 1e-8 || (diff / Math.abs(q.ans)) <= 1e-3) scores.s3 += eachScore;
+        if (isAnswerCorrect(inputs[idx], q.ans)) scores.s3 += eachScore;
     });
     updateLiveScore();
 
     showFinalResult();
 }
 
+function calculateStage3Score(allowPartial = false) {
+    if (!s3Questions.length) return 0;
+    const inputs = s3Questions.map((_, idx) => document.getElementById(`q${idx + 1}-ans`)?.value || '');
+    const eachScore = stageMaxScores.s3 / s3Questions.length;
+    let total = 0;
+
+    s3Questions.forEach((q, idx) => {
+        const raw = inputs[idx].trim();
+        if (raw === '') return;
+        if (allowPartial && !isPlainDecimalInput(raw)) return;
+        if (isAnswerCorrect(raw, q.ans)) total += eachScore;
+    });
+
+    return total;
+}
+
+function finalizeCurrentScores() {
+    if (s1ActiveData.length && scores.s1 === 0) {
+        scores.s1 = calculateMatchScore(s1ActiveData, stageMaxScores.s1);
+    }
+
+    if (s2ActiveData.length && scores.s2 === 0) {
+        scores.s2 = calculateMatchScore(s2ActiveData, stageMaxScores.s2);
+    }
+
+    scores.s3 = calculateStage3Score(true);
+}
+
 function showFinalResult() {
+    if (isResultShown) return;
+    isResultShown = true;
+    finalizeCurrentScores();
     let elapsedSecs = stopTimer();
     let rawTimeScore = calcTimeScore(elapsedSecs);
     
@@ -579,6 +637,8 @@ function showFinalResult() {
     let total = contentScore > 0 ? (contentScore + finalTimeScore) : 0;
     document.getElementById('res-total').innerText = Number(total.toFixed(2)).toString();
 
+    document.getElementById('modal')?.classList.add('hidden');
+    isExamMode = false;
     setLiveScoreVisibility(false);
     resetLiveScorePanel();
     showScreen('result-screen');
@@ -589,9 +649,12 @@ function resetGame() {
     if (timerInterval) clearInterval(timerInterval);
     timerInterval = null;
     currentElapsedSecs = 0;
+    currentRemainingSecs = EXAM_DURATION_SECS;
     document.getElementById('exam-timer').classList.add('hidden');
+    document.getElementById('timer-display').innerText = '05:00';
     scores.s1 = 0; scores.s2 = 0; scores.s3 = 0;
     isExamMode = false;
+    isResultShown = false;
     setLiveScoreVisibility(false);
     resetLiveScorePanel();
     updateLiveScore();
@@ -620,9 +683,8 @@ function calculateLiveStage3Score() {
     s3Questions.forEach((q, idx) => {
         const input = document.getElementById(`q${idx + 1}-ans`);
         if (!input || input.value === '') return;
-        const userAns = parseFloat(input.value);
-        const diff = Math.abs(userAns - q.ans);
-        if (diff < 1e-8 || (diff / Math.abs(q.ans)) <= 1e-3) live += eachScore;
+        if (!isPlainDecimalInput(input.value)) return;
+        if (isAnswerCorrect(input.value, q.ans)) live += eachScore;
     });
     return live;
 }

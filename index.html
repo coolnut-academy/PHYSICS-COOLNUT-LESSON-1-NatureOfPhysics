@@ -6,18 +6,18 @@
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Physics Coolnut: SI Units & Conversions</title>
           <link rel="icon" type="image/png" href="img/logo-lesson1.png">
-          <script src="https://cdn.tailwindcss.com"></script>
           <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+          <link href="css/tailwind.css" rel="stylesheet">
           <link href="css/style.css" rel="stylesheet">
 </head>
 
 <body class="p-4 sm:p-8 flex flex-col items-center justify-center relative w-full">
 
-          <!-- Timer UI -->
+          <!-- Countdown Timer UI -->
           <div id="exam-timer"
                     class="hidden fixed top-4 right-4 sm:top-6 sm:right-6 bg-white/95 backdrop-blur-md px-5 py-3 rounded-2xl shadow-xl border-2 border-red-200 z-50 flex items-center gap-3 text-red-500 font-bold text-xl sm:text-2xl transition-all">
                     <i class="fas fa-stopwatch animate-pulse"></i>
-                    <span id="timer-display" class="font-mono">00:00</span>
+                    <span id="timer-display" class="font-mono">05:00</span>
           </div>
           <div id="live-score-panel"
                     class="hidden fixed top-20 right-4 sm:top-24 sm:right-6 bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl shadow-lg border border-emerald-200 z-40 text-sm font-bold text-slate-700">
@@ -121,7 +121,7 @@
                                                                                 class="text-2xl font-black mb-1 tracking-wider">
                                                                                 โหมดทดสอบ</h3>
                                                                       <p class="text-sm font-medium opacity-90">
-                                                                                จับเวลาจริง เก็บ 10 คะแนน</p>
+                                                                                นับถอยหลัง 5 นาที เก็บ 10 คะแนน</p>
                                                             </div>
                                                   </button>
                                         </div>
@@ -379,7 +379,7 @@
 
                                                   <div
                                                             class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-                                                            <input type="number" step="any" id="prac-ans-input"
+                                                            <input type="text" inputmode="decimal" autocomplete="off" id="prac-ans-input"
                                                                       class="w-full sm:w-64 px-6 py-4 text-xl border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all text-center font-bold text-amber-700"
                                                                       placeholder="เช่น 0.000001 หรือ 1000000">
 
@@ -414,7 +414,7 @@
                                                             <h2 class="text-3xl font-bold text-slate-800">
                                                                       ลงทะเบียนผู้สอบ</h2>
                                                             <p class="text-slate-500 mt-2">
-                                                                      กรอกข้อมูลให้ครบถ้วนก่อนเริ่มจับเวลา</p>
+                                                                      กรอกข้อมูลให้ครบถ้วนก่อนเริ่มนับถอยหลัง 5 นาที</p>
                                                   </div>
 
                                                   <form id="student-form" onsubmit="startExam(event)"
@@ -461,7 +461,7 @@
                                                                                 class="text-sm text-blue-800 font-medium leading-relaxed">
                                                                                 กติกาการให้คะแนน: ด่านละ 2.5 คะแนน (รวม 7.5
                                                                                 คะแนน) + คะแนนเวลา 2.5 คะแนน<br>
-                                                                                <b>ต้องทำถูกครบและเสร็จภายใน 5 นาที (00:05:00) จึงมีสิทธิ์ได้ 10 เต็ม</b><br>
+                                                                                <b>มีเวลาทำแบบทดสอบ 5 นาที เมื่อหมดเวลาระบบจะสรุปคะแนนจากคำตอบที่ทำไว้ทันที</b><br>
                                                                                 คะแนนเวลาจะคูณตามความถูกต้องแบบเรียลไทม์ และ <b>ถ้าผิดหมด (คะแนนเนื้อหา = 0) จะได้ 0 คะแนนทันที</b>
                                                                       </p>
                                                             </div>

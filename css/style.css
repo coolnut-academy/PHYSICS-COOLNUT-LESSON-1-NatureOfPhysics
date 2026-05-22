@@ -96,7 +96,7 @@ body {
         line-height: 1.5 !important;
     }
 
-    #stage3-questions input[type="number"] {
+    #stage3-questions input {
         width: 100% !important;
         min-width: 0 !important;
     }

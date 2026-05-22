@@ -46,41 +46,77 @@ const conversionTypes = [
     { id: 20, type: 'power', from: 'GW', to: 'W', fromP: 1e9, toP: 1, text: "แปลงจาก จิกะวัตต์ (GW) เป็น วัตต์ (W)" }
 ];
 
-function formatPower(p) {
-    if(p === 1) return '1';
-    return `10<sup>${Math.log10(p)}</sup>`;
+function cleanCalculatedNumber(value) {
+    if (!Number.isFinite(value)) return value;
+    if (value === 0) return 0;
+
+    // Remove tiny binary floating-point artifacts such as 0.0004999999999999999.
+    const cleaned = Number(value.toPrecision(14));
+    return Object.is(cleaned, -0) ? 0 : cleaned;
 }
 
-function generateQuestionData() {
-    let qType = conversionTypes[Math.floor(Math.random() * conversionTypes.length)];
+function formatDecimalNumber(value) {
+    if (!Number.isFinite(value)) return '';
+    if (value === 0) return '0';
+
+    const cleaned = cleanCalculatedNumber(value);
+    const fromPrecision = cleaned.toPrecision(14).replace(/\.?0+$/, '');
+    let formatted = fromPrecision.includes('e')
+        ? cleaned.toLocaleString('en-US', {
+            useGrouping: false,
+            maximumFractionDigits: 20
+        })
+        : fromPrecision;
+
+    if (formatted.includes('.')) {
+        formatted = formatted.replace(/\.?0+$/, '');
+    }
+
+    return formatted === '-0' ? '0' : formatted;
+}
+
+function formatPower(p) {
+    if(p === 1) return '1';
+    return `10<sup>${Math.round(Math.log10(p))}</sup>`;
+}
+
+function generateQuestionData(qType = null) {
+    qType = qType || conversionTypes[Math.floor(Math.random() * conversionTypes.length)];
     let val;
     if(['kg', 'km', 'm', 'g', 'MW', 'GW'].includes(qType.from)) {
         val = parseFloat((Math.random() * 8 + 1).toFixed(1)); // 1.0 to 9.0
     } else {
         val = Math.floor(Math.random() * 90) * 10 + 100; // 100 to 990
     }
-    let ans = (val * qType.fromP) / qType.toP;
+    let ans = cleanCalculatedNumber((val * qType.fromP) / qType.toP);
     return {
         text: `จง${qType.text} เมื่อค่าเริ่มต้นคือ <b>${val}</b> ${qType.from}`,
         val: val,
+        valText: formatDecimalNumber(val),
         unitStr: qType.to,
         ans: ans,
+        ansText: formatDecimalNumber(ans),
         qType: qType
     };
 }
 
-function generateQuestionDataWithRoll(rollno = 0, questionIndex = 0) {
-    const q = generateQuestionData();
+function generateQuestionDataWithRoll(rollno = 0, questionIndex = 0, qType = null) {
+    const q = generateQuestionData(qType);
     const safeRoll = Number.isFinite(rollno) ? Math.max(0, Math.floor(rollno)) : 0;
-    const factor = 1 + ((safeRoll + questionIndex) % 7);
-    const adjustedVal = q.val * factor;
-    const adjustedAns = (adjustedVal * q.qType.fromP) / q.qType.toP;
+    const rollSeed = safeRoll || 1;
+    const smallDecimalUnits = ['kg', 'km', 'm', 'g', 'MW', 'GW'];
+    const adjustedVal = smallDecimalUnits.includes(q.qType.from)
+        ? cleanCalculatedNumber(q.val + (rollSeed / 1000) + (questionIndex / 100000))
+        : cleanCalculatedNumber(q.val + (rollSeed / 10) + (questionIndex / 1000));
+    const adjustedAns = cleanCalculatedNumber((adjustedVal * q.qType.fromP) / q.qType.toP);
 
     return {
-        text: `จง${q.qType.text} เมื่อค่าเริ่มต้นคือ <b>${adjustedVal}</b> ${q.qType.from} <span class="text-xs text-slate-500">(สุ่มจากเลขที่ ${safeRoll})</span>`,
+        text: `จง${q.qType.text} เมื่อค่าเริ่มต้นคือ <b>${formatDecimalNumber(adjustedVal)}</b> ${q.qType.from} <span class="text-xs text-slate-500">(ตัวเลขปรับตามเลขที่ ${safeRoll})</span>`,
         val: adjustedVal,
+        valText: formatDecimalNumber(adjustedVal),
         unitStr: q.qType.to,
         ans: adjustedAns,
+        ansText: formatDecimalNumber(adjustedAns),
         qType: q.qType
     };
 }
